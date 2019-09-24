@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Rxjs </title>
+</head>
+
+<body>
+    <button id="button">按钮</button>
+    <script src="https://cdn.bootcss.com/rxjs/6.0.0-alpha.3/Rx.min.js"></script>
+    <script>
+        var button = document.querySelector('button');
+
+        // 被观测对象
+        const observable = Rx.Observable.create(function(observer) {
+            // 同步推送
+            observer.next(1)
+            observer.next(2)
+            observer.next(3)
+
+            // 异步推送 并结束
+            setTimeout(() => {
+                observer.next(4)
+                observer.complete()
+            }, 2000)
+        })
+
+        Rx.Observable.fromEvent(button, 'click')
+            .subscribe(() => {
+                // 订阅
+                console.log('before subscribe')
+                observable.subscribe({
+                    next: (value) => {
+                        console.log('next:', value)
+                    },
+                    error: (error) => {
+                        console.error('error:', error)
+                    },
+                    complete: () => {
+                        console.log('complete')
+                    }
+                })
+                console.log('after subscribe')
+            })
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Rxjs </title>
+</head>
+
+<body>
+    <button id="button">按钮</button>
+    <script src="https://cdn.bootcss.com/rxjs/6.0.0-alpha.3/Rx.min.js"></script>
+    <script>
+        var button = document.querySelector('button');
+
+        Rx.Observable.fromEvent(button, 'click')
+            .scan(count => count + 1, 0) // 类似数据 reduce
+            .subscribe((count) => console.log('Button Clicked:', count));
+    </script>
+</body>
+
+</html>

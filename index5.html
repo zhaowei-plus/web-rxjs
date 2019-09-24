@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Rxjs </title>
+</head>
+
+<body>
+    <button id="button">按钮</button>
+    <script src="https://cdn.bootcss.com/rxjs/6.0.0-alpha.3/Rx.min.js"></script>
+    <script>
+        // 创建 observable    of、from、interval
+        const observable1 = Rx.Observable.interval(1000).take(4)
+        const observable2 = Rx.Observable.interval(1000).take(5)
+
+        const subscription = observable1.subscribe((value) => console.log('first:', value))
+        const childSubscribe = observable2.subscribe((value) => console.log('second:', value))
+
+        // 合并订阅，可以一次性取消多个订阅
+        subscription.add(childSubscribe)
+
+        // 取消订阅
+        setTimeout(() => {
+            // subscription 和 childSubscription 都会取消订阅
+            subscription.unsubscribe();
+        }, 1000);
+    </script>
+</body>
+
+</html>

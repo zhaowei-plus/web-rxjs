@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Rxjs </title>
+</head>
+
+<body>
+    <button id="button">按钮</button>
+    <script src="https://cdn.bootcss.com/rxjs/6.0.0-alpha.3/Rx.min.js"></script>
+    <script>
+        // Subject 是特殊类型的 Observable，允许将值多播给多个观察者
+        // 而普通的Observable是单播的（每个已订阅的观察者都拥有Observable的独立执行）
+        const subject = new Rx.Subject()
+
+        // 每个 Subject 都是 Observable
+        // 每个 Subject 都是观察者
+
+        // 添加订阅（观察者）
+        subject.subscribe({
+            next: (value) => {
+                console.log('observerA:', value)
+            }
+        })
+
+        // 添加订阅（观察者）
+        subject.subscribe({
+            next: (value) => {
+                console.log('observerB:', value)
+            }
+        })
+
+        // subject.next(1)
+        // subject.next(2)
+
+        const observable = Rx.Observable.from([1, 2, 3])
+
+        // 每个 Subject 都是观察者，可以订阅 Observable
+        observable.subscribe(subject)
+    </script>
+</body>
+
+</html>

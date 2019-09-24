@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Rxjs </title>
+</head>
+
+<body>
+    <button id="button">按钮</button>
+    <script src="https://cdn.bootcss.com/rxjs/6.0.0-alpha.3/Rx.min.js"></script>
+    <script>
+        // 创建 observable    of、from、interval
+        const observable1 = Rx.Observable.create((observer) => {
+            const intervalID = setInterval(() => {
+                observer.next('hi')
+            }, 1000)
+
+            // 返回取消和清理 interval 资源的方法
+            return () => {
+                clearInterval(intervalID)
+            }
+        })
+
+        // 添加订阅
+        const subscribe = observable1.subscribe({
+            next: (value) => {
+                console.log(' observable1 next:', value)
+            }
+        })
+
+        // 取消订阅
+        subscribe.unsubscribe()
+
+        // Rx.Observable.interval(1000)
+        //     .scan(count => count + 1, 0)
+        //     .subsceible(value => console.log('observable:', value))
+    </script>
+</body>
+
+</html>
