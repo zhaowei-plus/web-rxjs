@@ -18,8 +18,6 @@
     <a href="https://segmentfault.com/a/1190000009893235">地址</a>
     <a href="https://cn.rx.js.org/manual/overview.html#-">rxjs</a>
     <a href="https://www.learnrxjs.io/operators/transformation/scan.html">learn rxjs</a>
-    <a href="https://www.jianshu.com/p/867e9bf87b48">rxjs 操作符</a>
-    <a href="https://www.jianshu.com/search?q=30%20%E5%A4%A9%E7%B2%BE%E9%80%9A%20RxJS&page=1&type=note">30 天精通 RxJS</a>
     <div id="box"></div>
 
     <script src="https://cdn.bootcss.com/rxjs/6.0.0-alpha.3/Rx.min.js"></script>
@@ -29,28 +27,25 @@
         const mouseMove$ = Rx.Observable.fromEvent(document, 'mousemove')
         const mouseUp$ = Rx.Observable.fromEvent(document, 'mouseup')
 
-        /* map()操作符就是用于变换Observable对象的，不必返回Observable对象
-        的类型，可以返回一个新的数据类型的Observable对象，转换完毕继续发射数据*/
+        /* map()操作符就是用于变换Observable对象的，map操作符返回一个Observable对象，
+        这样就可以实现链式调用 */
         mouseDown$.map((event) => ({
                 pos: getTranslate(box),
                 event,
             }))
-            /* switchMap操作符会保存最新的Observable产生的结果而舍弃旧的结果 */
+            /* switchMap 操作符会保存最新的Observable产生的结果而舍弃旧的结果 */
             .switchMap((initialState) => {
                 const initialPos = initialState.pos
                 const {
                     clientX,
                     clientY
                 } = initialState.event
-
                 return mouseMove$.map((moveEvent) => ({
                         x: moveEvent.clientX - clientX + initialPos.x,
                         y: moveEvent.clientY - clientY + initialPos.y,
                     }))
-                    /* takeUntil当某件事情发生时，让Observable直接送出完成（complete）消息 */
                     .takeUntil(mouseUp$)
             })
-            // 提交产生的结果给订阅者
             .subscribe((pos) => {
                 setTranslate(box, pos)
             })
