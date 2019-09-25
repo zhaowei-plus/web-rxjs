@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Rxjs </title>
+    <style>
+        .box {
+            width: 300px;
+            height: 300px;
+            border: 1px solid red;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="box">box</div>
+    <script src="https://cdn.bootcss.com/rxjs/6.0.0-alpha.3/Rx.min.js"></script>
+    <script>
+        const click$ = Rx.Observable.fromEvent(document.body, 'click')
+
+        // 转换Observable 为二维阵列
+        const source$ = click$.map(e => Rx.Observable.of(1, 2, 3))
+
+        // concatAll 平铺二维阵列
+        const example$ = source$.concatAll()
+        example$.subscribe({
+            next: (value) => console.log('next:', value),
+            error: (error) => console.log('error:', error),
+            complete: () => console.log('complete:')
+        })
+    </script>
+</body>
+
+</html>

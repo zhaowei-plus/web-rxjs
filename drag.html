@@ -47,7 +47,8 @@
                         x: moveEvent.clientX - clientX + initialPos.x,
                         y: moveEvent.clientY - clientY + initialPos.y,
                     }))
-                    /* takeUntil当某件事情发生时，让Observable直接送出完成（complete）消息 */
+                    /* takeUntil当某件事情发生时，当takeUntil传入的Observable发送值时，原本的Observable立即
+                    进入complete状态，并直接送出完成（complete）消息 */
                     .takeUntil(mouseUp$)
             })
             // 提交产生的结果给订阅者

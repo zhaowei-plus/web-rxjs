@@ -5,7 +5,14 @@
     <meta charset="UTF-8">
     <title>Rxjs - 拖拽实现</title>
     <style>
-        #box {
+        body {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+        
+        #drag {
+            position: absolute;
             border: 1px solid red;
             width: 200px;
             height: 200px;
@@ -15,61 +22,34 @@
 </head>
 
 <body>
-    <a href="https://segmentfault.com/a/1190000009893235">地址</a>
-    <a href="https://cn.rx.js.org/manual/overview.html#-">rxjs</a>
-    <a href="https://www.learnrxjs.io/operators/transformation/scan.html">learn rxjs</a>
-    <div id="box"></div>
+    <div id="drag"></div>
 
     <script src="https://cdn.bootcss.com/rxjs/6.0.0-alpha.3/Rx.min.js"></script>
     <script>
-        const box = document.getElementById('box')
-        const mouseDown$ = Rx.Observable.fromEvent(box, 'mousedown')
-        const mouseMove$ = Rx.Observable.fromEvent(document, 'mousemove')
-        const mouseUp$ = Rx.Observable.fromEvent(document, 'mouseup')
+        const drag = document.getElementById('drag')
+        const mouseDown = Rx.Observable.fromEvent(drag, 'mousedown')
+        const mouseMove = Rx.Observable.fromEvent(document.body, 'mousemove')
+        const mouseUp = Rx.Observable.fromEvent(document.body, 'mouseup')
 
-        /* map()操作符就是用于变换Observable对象的，map操作符返回一个Observable对象，
-        这样就可以实现链式调用 */
-        mouseDown$.map((event) => ({
-                pos: getTranslate(box),
-                event,
+        mouseDown.subscribe((value) => console.log('mousedown:', value))
+            // mouseMove.subscribe((value) => console.log('mouseMove:', value))
+        mouseUp.subscribe((value) => console.log('mouseup:', value))
+
+        // 当mouseDown时，转成mouseMove的事件，mouseMove 要在 mouseUp 后结束
+        const source = mouseDown
+            // 转换 observable
+            .map(e => mouseMove.takeUntil(mouseUp))
+            // 用 concatAll() 摊平 source 成一维
+            .concatAll()
+            // 用 map 把 mousemove event 转成 x,y 的位置，并且订阅
+            .map(event => ({
+                x: event.clientX,
+                y: event.clientY,
             }))
-            /* switchMap 操作符会保存最新的Observable产生的结果而舍弃旧的结果 */
-            .switchMap((initialState) => {
-                const initialPos = initialState.pos
-                const {
-                    clientX,
-                    clientY
-                } = initialState.event
-                return mouseMove$.map((moveEvent) => ({
-                        x: moveEvent.clientX - clientX + initialPos.x,
-                        y: moveEvent.clientY - clientY + initialPos.y,
-                    }))
-                    .takeUntil(mouseUp$)
-            })
             .subscribe((pos) => {
-                setTranslate(box, pos)
+                drag.style.left = pos.x + 'px';
+                drag.style.top = pos.y + 'px';
             })
-
-        function setTranslate(element, pos) {
-            box.style.transform = `translate(${pos.x}px, ${pos.y}px)`
-        }
-
-        function getTranslate(element) {
-            const style = getComputedStyle(element)
-            const regExp = /matrix\((\d+,\s){4}(\d+),\s(\d+)/i
-            const result = style.transform.match(regExp)
-            if (result) {
-                return {
-                    x: parseInt(result[2], 10),
-                    y: parseInt(result[3], 10)
-                }
-            } else {
-                return {
-                    x: 0,
-                    y: 0
-                }
-            }
-        }
     </script>
 </body>
 

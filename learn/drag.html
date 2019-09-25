@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Rxjs - 拖拽实现</title>
+    <style>
+        #drag {
+            border: 1px solid red;
+            width: 200px;
+            height: 200px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="drag"></div>
+
+    <script src="https://cdn.bootcss.com/rxjs/6.0.0-alpha.3/Rx.min.js"></script>
+    <script>
+        const drag = document.getElementById('drag')
+        const mouseDown$ = Rx.Observable.fromEvent(drag, 'mousedown')
+        const mouseMove$ = Rx.Observable.fromEvent(document, 'mousemove')
+        const mouseUp$ = Rx.Observable.fromEvent(document, 'mouseup')
+
+        mouseDown$
+        // 转换数据，返回Box初始位置
+            .map(event => ({
+                pos: {
+                    x: 0,
+                    y: 0
+                },
+                event,
+            })
+            // 转换数据类型
+            .switchMap((initialState) => {
+                const {
+                    pos,
+                    event
+                } = initialState
+
+            })
+        )
+    </script>
+</body>
+
+</html>

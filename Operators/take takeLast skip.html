@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Rxjs - Operator</title>
+    <style>
+        .box {
+            width: 300px;
+            height: 300px;
+            border: 1px solid red;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="box">box</div>
+    <script src="https://cdn.bootcss.com/rxjs/6.0.0-alpha.3/Rx.min.js"></script>
+    <script>
+        var source = Rx.Observable.interval(1000).take(6);
+        // take 可以取前2个送出的元素
+        var takeExample = source.take(2);
+        takeExample.subscribe({
+            next: (value) => {
+                console.log('takeExample next:', value);
+            },
+            error: (error) => {
+                console.log('takeExample error:', error);
+            },
+            complete: () => {
+                console.log('takeExample complete:');
+            }
+        });
+
+        // takeLast 反向取值：takeLast 后，比须等到原本的 observable 完成后，才立即同步送出 4, 5, complete。
+        // last = takeLast(1) 取最后一个
+        var takeLastExample = source.takeLast(2);
+        takeLastExample.subscribe({
+            next: (value) => {
+                console.log('takeLastExample next:', value);
+            },
+            error: (error) => {
+                console.log('takeLastExample error:', error);
+            },
+            complete: () => {
+                console.log('takeLastExample complete:');
+            }
+        });
+
+        // skip 略过前3个送出元素
+        var skipExample = source.skip(3);
+        skipExample.subscribe({
+            next: (value) => {
+                console.log('skipExample next:', value);
+            },
+            error: (error) => {
+                console.log('skipExample error:', error);
+            },
+            complete: () => {
+                console.log('skipExample complete:');
+            }
+        });
+    </script>
+</body>
+
+</html>
