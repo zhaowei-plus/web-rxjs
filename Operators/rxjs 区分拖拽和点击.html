@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>throttle 有关联关系的节流处理</title>
+    <style>
+        html {
+            height: 100vh;
+        }
+        
+        div {
+            height: 100px;
+            background: red;
+        }
+        
+        #bbb {
+            background: blue;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="aaa"></div>
+    <div id="bbb"></div>
+    <script src="https://cdn.bootcss.com/rxjs/6.4.0/rxjs.umd.min.js"></script>
+    <script>
+        const {
+            fromEvent
+        } = rxjs
+
+        const {
+            auditTime
+        } = rxjs.operators
+
+        const source = fromEvent(document, 'click')
+
+        source.subscribe(() => {
+            console.log('normal click')
+        })
+
+        const example = source.pipe(auditTime(1000)) //  延时1秒，在这延时到时后，数据是最后一次点击的数据信息
+
+        // Output (example): '(1s) --- Clicked --- (1s) --- Clicked' 
+        const subscribe = example.subscribe(val => console.log('auditTime Clicked'));
+    </script>
+</body>
+
+</html>

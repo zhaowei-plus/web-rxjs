@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>throttleTime 节流处理</title>
+    <style>
+        html {
+            height: 100vh;
+        }
+    </style>
+    <script src="https://cdn.bootcss.com/rxjs/6.4.0/rxjs.umd.min.js"></script>
+</head>
+
+<body>
+    <script>
+        const {
+            fromEvent
+        } = rxjs;
+        const {
+            throttleTime
+        } = rxjs.operators;
+        let k = 0;
+        const clicks = fromEvent(document, 'click');
+        const result = clicks.pipe(throttleTime(1000));
+        result.subscribe(() => {
+            const i = Date.now();
+            if (k) {
+                console.log(i - k);
+            }
+            k = i;
+        });
+    </script>
+</body>
+
+</html>

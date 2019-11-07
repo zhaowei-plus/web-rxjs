@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>debounceTime 防抖处理</title>
+    <style>
+        html {
+            height: 100vh;
+        }
+    </style>
+    <script src="https://cdn.bootcss.com/rxjs/6.4.0/rxjs.umd.min.js"></script>
+</head>
+
+<body>
+    <script>
+        const {
+            fromEvent
+        } = rxjs;
+
+        const {
+            debounceTime
+        } = rxjs.operators;
+
+        const click$ = fromEvent(document, 'click');
+        const result = click$.pipe(debounceTime(1000));
+        result.subscribe(x => console.log('debounceTime 防抖处理：1秒触发一次'));
+    </script>
+</body>
+
+</html>

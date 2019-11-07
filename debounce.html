@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>debounce 顺序依赖，必须等待两个Observable 都触发时，才有肯能发射数据</title>
+    <style>
+        html {
+            height: 100vh;
+        }
+        
+        div {
+            height: 100px;
+            background: red;
+        }
+        
+        #bbb {
+            background: blue;
+        }
+    </style>
+    <script src="https://cdn.bootcss.com/rxjs/6.4.0/rxjs.umd.min.js"></script>
+</head>
+
+<body>
+    <div id="aaa"></div>
+    <div id="bbb"></div>
+    <script>
+        const {
+            fromEvent
+        } = rxjs;
+        const {
+            debounce
+        } = rxjs.operators;
+
+        const clicksaaa = fromEvent(document.querySelector('#aaa'), 'click');
+        const clicksbbb = fromEvent(document.querySelector('#bbb'), 'click');
+
+        const result = clicksaaa.pipe(debounce(() => clicksbbb /* timer(1000) */ ));
+        result.subscribe(x => console.log('点击了 Aa后，点击了bb'));
+    </script>
+</body>
+
+</html>

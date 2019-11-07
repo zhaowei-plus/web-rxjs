@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Rxjs share</title>
+    <style>
+
+    </style>
+</head>
+
+<body>
+    <script src="https://unpkg.com/rxjs/bundles/rxjs.umd.min.js"></script>
+    <script>
+        const {
+            timer,
+        } = rxjs
+
+        const {
+            tap,
+            mapTo,
+            share,
+        } = rxjs.operators
+
+        // 1 秒之后发出值
+        const source = timer(1000)
+
+        const example = source.pipe(
+            tap(() => console.log('***SIDE EFFECT 副作用***')), // 副作用
+            mapTo('****RESULT***'),
+        )
+
+        // 正常会打印两次副作用
+        const subsceibe1 = example.subscribe(text => console.log('1:', text))
+        const subsceibe2 = example.subscribe(text => console.log('2:', text))
+
+        // 共享的话，副作用只执行一次
+        const sharedExample = example.pipe(share());
+        const sharedSubscribe1 = sharedExample.subscribe(text => console.log('1:', text))
+        const sharedSubscribe2 = sharedExample.subscribe(text => console.log('2:', text))
+    </script>
+</body>
+
+</html>

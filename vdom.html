@@ -1,0 +1,44 @@
+<body>
+    <div id="container"></div>
+    <button id='btn-change'>change</button>
+
+    <script src="https://cdn.bootcss.com/snabbdom/0.7.1/h.js"></script>
+    <script src="https://cdn.bootcss.com/snabbdom/0.7.1/snabbdom.js"></script>
+    <script src="https://cdn.bootcss.com/snabbdom/0.7.1/snabbdom-style.js"></script>
+    <script src="https://cdn.bootcss.com/snabbdom/0.7.1/snabbdom-props.js"></script>
+    <script src="https://cdn.bootcss.com/snabbdom/0.7.1/snabbdom-class.js"></script>
+    <script src="https://cdn.bootcss.com/snabbdom/0.7.1/snabbdom-eventlisteners.js"></script>
+
+    <script>
+        var snabbdom = window.snabbdom
+
+        var patch = snabbdom.init([
+            snabbdom_class,
+            snabbdom_props,
+            snabbdom_style,
+            snabbdom_eventlisteners
+        ])
+
+        var h = snabbdom.h
+
+        var container = document.getElementById('container')
+            // 生成vnode
+        var vnode = h('ul#list', {}, [
+                h('li.item', {}, 'item 1'),
+                h('li.item', {}, 'item 2'),
+            ])
+            // 初次渲染,把vnode的内容全部添加到空白的容器中
+        patch(container, vnode)
+
+        document.getElementById('btn-change').addEventListener('click', () => {
+            // 生成新的vnode
+            var newVnode = h('ul#list', {}, [
+                    h('li.item', {}, 'item 1'),
+                    h('li.item', {}, 'item B'),
+                    h('li.item', {}, 'item 3'),
+                ])
+                // 再次渲染,对比new vnode 和 old vnode,将真正需要渲染的部分进行渲染,不需要渲染的部分,不会更改 
+            patch(vnode, newVnode)
+        })
+    </script>
+</body>

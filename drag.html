@@ -22,39 +22,81 @@
     <a href="https://www.jianshu.com/search?q=30%20%E5%A4%A9%E7%B2%BE%E9%80%9A%20RxJS&page=1&type=note">30 天精通 RxJS</a>
     <div id="box"></div>
 
-    <script src="https://cdn.bootcss.com/rxjs/6.0.0-alpha.3/Rx.min.js"></script>
+    <script src="https://unpkg.com/rxjs/bundles/rxjs.umd.min.js"></script>
     <script>
+        console.log('rxjs:', rxjs)
+        const {
+            fromEvent,
+            Observable,
+            range
+        } = rxjs
+
+        const {
+            map,
+            switchMap
+        } = rxjs.operators
+
+        console.log('Observable:', Observable)
         const box = document.getElementById('box')
-        const mouseDown$ = Rx.Observable.fromEvent(box, 'mousedown')
-        const mouseMove$ = Rx.Observable.fromEvent(document, 'mousemove')
-        const mouseUp$ = Rx.Observable.fromEvent(document, 'mouseup')
+        const mouseDown$ = fromEvent(box, 'mousedown')
+        const mouseMove$ = fromEvent(document, 'mousemove')
+        const mouseUp$ = fromEvent(document, 'mouseup')
 
-        /* map()操作符就是用于变换Observable对象的，不必返回Observable对象
-        的类型，可以返回一个新的数据类型的Observable对象，转换完毕继续发射数据*/
-        mouseDown$.map((event) => ({
-                pos: getTranslate(box),
-                event,
-            }))
-            /* switchMap操作符会保存最新的Observable产生的结果而舍弃旧的结果 */
-            .switchMap((initialState) => {
+        mouseDown$.pipe(
+            map(event => {
+                console.log('mouseDown - event')
+
+                // 鼠标按下时，获取box左上角坐标，以及鼠标点击事件，获取点击时的坐标位置
+                return {
+                    pos: getTranslate(box),
+                    event,
+                }
+            }),
+            switchMap(initialState => {
+                console.log('switchMap')
+                    // 获取box左上角位置
                 const initialPos = initialState.pos
-                const {
-                    clientX,
-                    clientY
-                } = initialState.event
+                    // 获取鼠标按下时的坐标
+                const downEvent = initialState.event
 
-                return mouseMove$.map((moveEvent) => ({
-                        x: moveEvent.clientX - clientX + initialPos.x,
-                        y: moveEvent.clientY - clientY + initialPos.y,
-                    }))
-                    /* takeUntil当某件事情发生时，当takeUntil传入的Observable发送值时，原本的Observable立即
-                    进入complete状态，并直接送出完成（complete）消息 */
+                // 监听mouseMove事件，当触发mouseMove事件时，计算坐标位置，并移动box，知道触发mouseUp事件
+                return mouseMove$
+                    .map(moveEvent => {
+                        // 返回移动之后的位置
+                        return {
+                            x: moveEvent.clientX - downEvent.clientX + initialPos.x,
+                            y: moveEvent.clientY - downEvent.clientY + initialPos.y,
+                        }
+                    })
                     .takeUntil(mouseUp$)
             })
-            // 提交产生的结果给订阅者
-            .subscribe((pos) => {
-                setTranslate(box, pos)
-            })
+        ).subscribe(value => console.log('value:', value))
+
+
+        // .map((event) => ({
+        //         pos: getTranslate(box),
+        //         event,
+        //     }))
+        //     /* switchMap操作符会保存最新的Observable产生的结果而舍弃旧的结果 */
+        //     .switchMap((initialState) => {
+        //         const initialPos = initialState.pos
+        //         const {
+        //             clientX,
+        //             clientY
+        //         } = initialState.event
+
+        //         return mouseMove$.map((moveEvent) => ({
+        //                 x: moveEvent.clientX - clientX + initialPos.x,
+        //                 y: moveEvent.clientY - clientY + initialPos.y,
+        //             }))
+        //             /* takeUntil当某件事情发生时，当takeUntil传入的Observable发送值时，原本的Observable立即
+        //             进入complete状态，并直接送出完成（complete）消息 */
+        //             .takeUntil(mouseUp$)
+        //     })
+        //     // 提交产生的结果给订阅者
+        //     .subscribe((pos) => {
+        //         setTranslate(box, pos)
+        //     })
 
         function setTranslate(element, pos) {
             box.style.transform = `translate(${pos.x}px, ${pos.y}px)`

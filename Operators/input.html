@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Rxjs </title>
+    <style>
+        .box {
+            width: 300px;
+            height: 120px;
+            margin: 20px auto;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .buttonBox {
+            display: flex;
+            align-content: center;
+            justify-content: space-between;
+        }
+        
+        .button {
+            display: block;
+            text-align: center;
+            border: 1px solid red;
+        }
+        
+        .inputBox {
+            margin-top: 20px;
+        }
+        
+        input {
+            width: 100%;
+            height: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="box">
+        <div class="buttonBox">
+            <button class="button" id="button1">【活动标题】</button>
+            <button class="button" id="button2">【活动链接】</button>
+            <button class="button" id="button3">【活动时间】</button>
+        </div>
+        <div class="inputBox">
+            <input id="input" value="输入测试输入测试输入测试输入测试" />
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/rxjs/bundles/rxjs.umd.min.js"></script>
+    <script>
+        console.log('input:', input)
+
+        const {
+            fromEvent,
+            range
+        } = rxjs
+
+        const {
+            map,
+            combineLatest,
+            withLatestFrom,
+        } = rxjs.operators
+
+        const input$ = fromEvent(input, 'focus')
+        input$.subscribe(() => {
+            console.log('input focus')
+        })
+        const inputBlur$ = fromEvent(input, 'blur')
+        inputBlur$.subscribe(() => {
+            console.log('input blur')
+        })
+
+        const button1$ = fromEvent(button1, 'click')
+        button1$.subscribe((value) => {
+            console.log('button1 click')
+            value.preventDefault()
+        })
+
+        const example = button1$.pipe(
+            withLatestFrom(input$, (x, y) => {
+                console.log('x:', x, ' y:', y)
+                return {
+                    x,
+                    y,
+                }
+            })
+        )
+
+        example.subscribe({
+            next: (value) => {
+                const {
+                    x,
+                    y
+                } = value
+                console.log('next:', value)
+                y.target.focus()
+                y.target.setSelectionRange(5, 7)
+            }
+        })
+    </script>
+</body>
+
+</html>
