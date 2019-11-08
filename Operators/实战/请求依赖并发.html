@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Rxjs 请求依赖并发</title>
+</head>
+
+<body>
+    <h5>描述：发起一个用户登录请求，成功后再发送3个查询请求（资料,邮件,消息），最后将结果合并输出结果。</h5>
+    <script src="https://cdn.bootcss.com/rxjs/6.4.0/rxjs.umd.min.js"></script>
+    <script>
+        const {
+            Observable,
+            Subject,
+            from,
+        } = rxjs
+
+        const {
+            flatMap,
+            combineAll,
+            tap,
+        } = rxjs.operators
+
+        const loginRequest = new Promise((resolve, reject) => {
+            setTimeout(function() {
+                console.log('loginRequest')
+                resolve({
+                    sessionId: 'xxx-xxx-xxx'
+                })
+            }, 2000);
+        });
+
+        const queryInfoRequest = function(sessionId) {
+            return new Promise((resolve, reject) => {
+                setTimeout(function() {
+                    resolve({
+                        id: 1,
+                        nickName: 'lake'
+                    })
+                }, 1000)
+            })
+        };
+
+        const queryEmailRequest = function(sessionId) {
+            return new Promise((resolve, reject) => {
+                setTimeout(function() {
+                    resolve([{
+                        id: 1,
+                        title: 'hi',
+                        content: 'I miss you'
+                    }, {
+                        id: 2,
+                        title: 'are you there',
+                        content: 'how are you doing'
+                    }])
+                }, 1000)
+            })
+        };
+
+        const queryMessageRequest = function(sessionId) {
+            return new Promise((resolve, reject) => {
+                setTimeout(function() {
+                    resolve([{
+                        id: 1,
+                        type: 'TEXT',
+                        content: 'I am ok'
+                    }, {
+                        id: 2,
+                        type: 'TEXT',
+                        content: 'yeah'
+                    }])
+                }, 1000)
+            })
+        };
+
+        const oldTime = new Date().getTime();
+        from(loginRequest).pipe(
+                // flatMap 将 Observable 转换成数据流
+                flatMap(sessionId => {
+                    return [
+                        from(queryInfoRequest(sessionId)),
+                        from(queryEmailRequest(sessionId)),
+                        from(queryMessageRequest(sessionId)),
+                    ];
+                }),
+                tap(v => console.log('tap:', v)),
+                // 发出 Observable 中的值
+                combineAll()
+            )
+            .subscribe(value => {
+                console.log(value);
+                console.log("总运行时长:" + (new Date() - oldTime));
+            });
+
+        // flatMap 最适合用于处理搜索框
+        // Observable
+        //     .fromEvent($input, 'keyup')
+        //     .flatMap(text => getHttpResponse(text))
+        //     .subscribe(data => console.log(data))
+    </script>
+</body>
+
+</html>

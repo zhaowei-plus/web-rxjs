@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Subject</title>
+</head>
+
+<body>
+    <div id="aaa"></div>
+    <div id="bbb"></div>
+    <script src="https://cdn.bootcss.com/rxjs/6.4.0/rxjs.umd.min.js"></script>
+    <script>
+        const {
+            Subject,
+            BehaviorSubject,
+            ReplaySubject,
+            AsyncSubject,
+        } = rxjs
+
+        // Subject本身既可以是Observable也可以是Observer
+        const subject = new Subject()
+
+        subject.next('100')
+
+        // 订阅者在数据源发射数据之后订阅，拿不到之前的数据
+        subject.subscribe(text => console.log('subscribeA:', text))
+        subject.subscribe(text => console.log('subscribeB:', text))
+
+        subject.next('200')
+        subject.next('300')
+
+        // BehaviorSubject 会存储最后一次发射的数据
+        const subject1 = new BehaviorSubject(0)
+
+        subject1.next(1000)
+        subject1.next(2000)
+        subject1.subscribe(val => console.log('BehaviorSubject subscribeA:', val))
+        subject1.next(3000)
+        subject1.subscribe(val => console.log('BehaviorSubject subscribeB:', val))
+        subject1.next(4000)
+
+
+        // ReplaySubject 保存之前所有的数据，当订阅时返回之前所有的数据
+        const subject2 = new ReplaySubject()
+
+        subject2.next(1000)
+        subject2.next(2000)
+        subject2.subscribe(val => console.log('ReplaySubject subscribeA:', val))
+        subject2.next(3000)
+        subject2.subscribe(val => console.log('ReplaySubject subscribeB:', val))
+        subject2.next(4000)
+
+        // AsyncSubject 和BehaviorSubject一样只会存储最后一次发出的数据，但是AsyncSubject 只会在complete时把数据发射出去
+        const subject4 = new AsyncSubject()
+        subject4.next(1000)
+        subject4.next(2000)
+        subject4.subscribe(val => console.log('AsyncSubject subscribeA:', val))
+        subject4.next(3000)
+        subject4.subscribe(val => console.log('AsyncSubject subscribeB:', val))
+        subject4.next(4000)
+        subject4.complete(); // 只有在 complete时把上一次缓存的值发射出去
+        // 会存储之前的值
+        subject4.subscribe(val => console.log('AsyncSubject subscribeC:', val))
+        subject4.next(5000) // 收不到complete 之后的值
+    </script>
+</body>
+
+</html>

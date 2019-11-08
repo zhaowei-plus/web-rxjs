@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>of</title>
+</head>
+
+<body>
+    <script src="https://cdn.bootcss.com/rxjs/6.4.0/rxjs.umd.min.js"></script>
+    <script>
+        // 方向位移问题
+        const DIRECTIONS = {
+            37: {
+                x: -1,
+                y: 0
+            },
+            39: {
+                x: 1,
+                y: 0
+            },
+            38: {
+                x: 0,
+                y: -1
+            },
+            40: {
+                x: 0,
+                y: 1
+            }
+        };
+
+        const {
+            of,
+            Scheduler,
+            interval,
+            fromEvent,
+        } = rxjs
+
+        const {
+            map,
+            tap,
+            scan,
+            filter,
+            startWith,
+            switchMap,
+            distinctUntilChanged,
+        } = rxjs.operators
+
+        let keydown$ = fromEvent(document, 'keydown');
+
+        // 时间控制方向
+        let direction$ = keydown$.pipe(
+            map((event) => DIRECTIONS[event.keyCode]),
+            filter(direction => !!direction),
+            startWith({
+                x: -1,
+                y: 0
+            }),
+            scan((prev, next) => {
+                console.log('direction scan:', next)
+                return next
+            }),
+            // 避免重复处理
+            distinctUntilChanged()
+        );
+
+        of('Start Game').pipe(
+            tap(v => console.log('value:', v)),
+            map(() => interval(1000)),
+            // switchMap(interval$ => direction$),
+            map(v => v),
+            tap(console.log),
+        ).subscribe(v => console.log('subscribe:', v))
+    </script>
+</body>
+
+</html>
